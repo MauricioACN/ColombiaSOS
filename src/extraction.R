@@ -3,7 +3,7 @@ library(tidyverse)
 source('credenciales/credenciales.R', encoding = 'UTF-8')
 ### Functions
 
-extract_tweets <- function(hastags){
+extract_tweets <- function(hashtags){
   
   token_tw = create_token(app = APP_NAME,
                           consumer_key = TWITTER_API_KEY,
@@ -18,13 +18,19 @@ extract_tweets <- function(hastags){
   #                           components = "country:Colombia",
   #                           apikey= Sys.getenv(GOOGLE_API_KEY))
   
-  df = rtweet::search_tweets2(paste('#',hastags,sep = ""),n = 18000,include_rts = F, 
-                                    token = token_tw,retryonratelimit = T)
+  df = rtweet::search_tweets2(paste('#',hashtags,sep = ""),n = 18000,include_rts = F, 
+                                    token = token_tw,retryonratelimit = T, )
   
   df = df %>% distinct(status_id,.keep_all = T)
   
   ### agregar escritura de la base de datos en S3
   
-  
+  df
 }
+
+hashtags = c("CalienCensura","SOSColombiaNoDuerme")
+
+base = extract_tweets(hashtags)
+
+write_rds(base,paste0("dataframes/",Sys.Date(),"-base.rds"))
 
